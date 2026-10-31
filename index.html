@@ -1208,14 +1208,9 @@ async function submitSurvey(event) {
   submitButton.disabled = true;
   submitButton.textContent = "Submitting...";
 
-  try {
-    const isPaid = await hasConfirmedPayment();
-
-    if (!isPaid) {
-      throw new Error(
-        "Your membership access has not been confirmed."
-      );
-    }
+  try // Allow members to view published surveys before payment.
+// Payment is still required before answering.
+area.textContent = "Loading surveys...";
 
     const { error } =
       await supabaseClient
