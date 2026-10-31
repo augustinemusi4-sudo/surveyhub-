@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SurveyHub Kenya</title>
@@ -424,27 +425,38 @@ function getCurrentUser() {
   return localStorage.getItem("surveyhub_logged_in");
 }
 
-function registerUser(event) {
+async function registerUser(event) {
   event.preventDefault();
 
-  const account = {
-    name: document.getElementById("regName").value.trim(),
-    email: document.getElementById("regEmail").value.trim().toLowerCase(),
-    phone: document.getElementById("regPhone").value.trim(),
-    password: document.getElementById("regPassword").value,
-    paid: false
-  };
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim().toLowerCase();
+  const phone = document.getElementById("regPhone").value.trim();
+  const password = document.getElementById("regPassword").value;
+  const message = document.getElementById("regMessage");
 
-  if (getAccount() && getAccount().email === account.email) {
-    document.getElementById("regMessage").textContent =
-      "This email is already registered. Please login.";
+  message.textContent = "Creating your account...";
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        full_name: name,
+        phone: phone
+      }
+    }
+  });
+
+  if (error) {
+    message.textContent = error.message;
     return;
   }
 
-  // Demonstration only: this is not secure production authentication.
-  localStorage.setItem("surveyhub_account", JSON.stringify(account));
-  document.getElementById("regMessage").textContent =
-    "Account created! Please login.";
+  if (data.session) {
+    message.textContent = "Registration successful! You can now log in.";
+  } else {
+    message.textContent = "Account created. Check your email to confirm your account.";
+  }
 
   document.getElementById("registerForm").reset();
 }
@@ -593,6 +605,12 @@ if (getCurrentUser()) {
   showPage("home");
 }
 </script>
+const SUPABASE_URL = "https://ewbtnttjruvfkogramxt.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_b-_n6tI5wMX9GK_kAW6Rzg_OTtYhW3C";
 
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 </body>
 </html>
