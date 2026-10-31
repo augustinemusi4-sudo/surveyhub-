@@ -1,616 +1,1163 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SurveyHub Kenya</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SurveyHub Kenya</title>
 
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-}
+  <!-- Supabase library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-body {
-  background: #f4f7fb;
-  color: #202b3c;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-header {
-  background: #075b45;
-  color: white;
-  padding: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+    body {
+      background: #f3f6f4;
+      color: #222;
+      line-height: 1.6;
+    }
 
-.logo {
-  font-size: 22px;
-  font-weight: bold;
-}
+    header {
+      background: #075b3b;
+      color: white;
+      padding: 18px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-nav {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+    header h1 {
+      font-size: 23px;
+    }
 
-nav button {
-  background: transparent;
-  color: white;
-  border: 1px solid #ffffff66;
-  padding: 9px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-nav button:hover {
-  background: #ffffff22;
-}
+    nav button {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-.container {
-  max-width: 950px;
-  margin: 25px auto;
-  padding: 15px;
-}
+    nav button:hover {
+      background: white;
+      color: #075b3b;
+    }
 
-.hero {
-  background: linear-gradient(120deg, #075b45, #0b9871);
-  color: white;
-  padding: 38px 22px;
-  border-radius: 14px;
-  text-align: center;
-}
+    .container {
+      width: 92%;
+      max-width: 1000px;
+      margin: 25px auto;
+    }
 
-.hero h1 {
-  font-size: 30px;
-  margin-bottom: 12px;
-}
+    .page {
+      display: none;
+    }
 
-.hero p {
-  line-height: 1.6;
-}
+    .page.active {
+      display: block;
+    }
 
-.card {
-  background: white;
-  padding: 22px;
-  border-radius: 12px;
-  margin-top: 20px;
-  box-shadow: 0 3px 14px #0000000d;
-}
+    .hero {
+      background: #075b3b;
+      color: white;
+      padding: 55px 25px;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
 
-h2 {
-  color: #075b45;
-  margin-bottom: 15px;
-}
+    .hero h2 {
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
 
-p {
-  line-height: 1.6;
-}
+    .hero p {
+      margin-bottom: 20px;
+    }
 
-input, textarea {
-  width: 100%;
-  padding: 13px;
-  margin: 8px 0 14px;
-  border: 1px solid #ccd5df;
-  border-radius: 7px;
-  font-size: 15px;
-}
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 9px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 9px rgba(0,0,0,0.07);
+    }
 
-button.primary {
-  background: #07845f;
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 15px;
-}
+    h2, h3 {
+      color: #075b3b;
+      margin-bottom: 14px;
+    }
 
-button.primary:hover {
-  background: #056b4c;
-}
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+    }
 
-button.secondary {
-  background: #e9f4ef;
-  color: #075b45;
-  border: 1px solid #b8d8ca;
-  padding: 11px 16px;
-  border-radius: 7px;
-  cursor: pointer;
-}
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 8px;
+    }
 
-.hidden {
-  display: none !important;
-}
+    button.primary {
+      background: #087747;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+    }
 
-.notice {
-  background: #fff5dc;
-  padding: 13px;
-  border-radius: 7px;
-  margin: 12px 0;
-  color: #72520b;
-  line-height: 1.5;
-}
+    button.primary:hover {
+      background: #064d30;
+    }
 
-.success {
-  color: #08764f;
-  margin: 10px 0;
-}
+    button.secondary {
+      background: #555;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-.survey {
-  border: 1px solid #e0e7ed;
-  padding: 16px;
-  border-radius: 9px;
-  margin: 12px 0;
-}
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
 
-.survey h3 {
-  margin-bottom: 8px;
-}
+    .message {
+      margin-top: 12px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
 
-.question {
-  margin: 18px 0;
-}
+    .success {
+      color: #087747;
+    }
 
-.question label {
-  display: block;
-  margin: 9px 0;
-}
+    .error {
+      color: #c62828;
+    }
 
-footer {
-  background: #073d32;
-  color: white;
-  text-align: center;
-  padding: 25px;
-  margin-top: 35px;
-}
+    .notice {
+      background: #fff4d6;
+      border-left: 4px solid #d99b00;
+      padding: 13px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
 
-footer p {
-  font-size: 14px;
-}
+    .survey-item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 7px;
+      margin: 12px 0;
+    }
 
-@media(max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    .survey-item h3 {
+      margin-bottom: 5px;
+    }
 
-  nav {
-    width: 100%;
-  }
+    .question {
+      margin: 18px 0;
+    }
 
-  nav button {
-    font-size: 12px;
-    padding: 8px;
-  }
+    .question label {
+      margin-bottom: 8px;
+    }
 
-  .hero h1 {
-    font-size: 25px;
-  }
-}
-</style>
+    footer {
+      background: #063d29;
+      color: white;
+      text-align: center;
+      padding: 22px;
+      margin-top: 40px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        width: 100%;
+      }
+
+      nav button {
+        font-size: 12px;
+        padding: 7px 9px;
+      }
+
+      .hero h2 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 17px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">SurveyHub Kenya</div>
+  <h1>SurveyHub Kenya</h1>
 
   <nav>
-    <button onclick="showPage('home')">Home</button>
-    <button onclick="showPage('about')">About</button>
-    <button onclick="showPage('faq')">FAQs</button>
-    <button onclick="showPage('login')">Login</button>
-    <button onclick="showPage('register')">Register</button>
-    <button onclick="logout()" id="logoutBtn" class="hidden">Logout</button>
+    <button onclick="showPage('homePage')">Home</button>
+    <button onclick="showPage('aboutPage')">About</button>
+    <button onclick="showPage('faqPage')">FAQs</button>
+    <button onclick="showPage('registerPage')">Register</button>
+    <button onclick="showPage('loginPage')">Login</button>
+    <button id="dashboardNav" class="hidden"
+      onclick="openDashboard()">Dashboard</button>
   </nav>
 </header>
 
 <main class="container">
 
   <!-- HOME -->
-  <section id="home">
+  <section id="homePage" class="page active">
+
     <div class="hero">
-      <h1>Welcome to SurveyHub Kenya</h1>
-      <p>Discover surveys, share your opinions and participate in research questionnaires.</p>
-      <br>
-      <button class="primary" onclick="showPage('register')">
-        Create an Account
+      <h2>Welcome to SurveyHub Kenya</h2>
+      <p>
+        A platform where registered members can participate
+        in available surveys and share their opinions.
+      </p>
+      <button class="primary"
+        onclick="showPage('registerPage')">
+        Get Started
       </button>
     </div>
 
     <div class="card">
       <h2>How SurveyHub Works</h2>
       <p>1. Create your account.</p>
-      <p>2. Pay the one-time KSh 50 access fee.</p>
-      <p>3. Once payment is verified, access available surveys.</p>
-      <p>4. Submit your answers and view your survey history.</p>
+      <p>2. Access the member dashboard.</p>
+      <p>3. Complete the required access payment when payment
+        integration is available.</p>
+      <p>4. Participate in published surveys.</p>
+      <p>5. View your submitted survey responses.</p>
     </div>
 
-    <div class="card">
-      <h2>Membership Access</h2>
-      <p><strong>One-time registration fee: KSh 50</strong></p>
-      <p>This fee provides access to the survey area. It does not guarantee employment, earnings or rewards.</p>
-      <br>
-      <button class="primary" onclick="showPage('register')">
-        Join SurveyHub
-      </button>
+    <div class="notice">
+      <strong>Important:</strong> SurveyHub currently charges a
+      proposed one-time access fee of KSh 50. Members are not paid
+      for answering surveys. Registration or payment does not
+      guarantee income or employment.
     </div>
+
   </section>
 
   <!-- REGISTER -->
-  <section id="register" class="hidden">
+  <section id="registerPage" class="page">
     <div class="card">
-      <h2>Create Your Account</h2>
+      <h2>Create an Account</h2>
 
       <form id="registerForm">
-        <label>Full name</label>
-        <input id="regName" required placeholder="Enter your full name">
 
-        <label>Email address</label>
-        <input id="regEmail" type="email" required placeholder="Enter your email">
+        <label for="regName">Full Name</label>
+        <input id="regName" type="text"
+          placeholder="Enter your full name" required>
 
-        <label>Phone number</label>
-        <input id="regPhone" type="tel" required placeholder="e.g. 07XXXXXXXX">
+        <label for="regEmail">Email Address</label>
+        <input id="regEmail" type="email"
+          placeholder="Enter your email" required>
 
-        <label>Create password</label>
-        <input id="regPassword" type="password" minlength="8" required placeholder="At least 8 characters">
+        <label for="regPhone">Phone Number</label>
+        <input id="regPhone" type="tel"
+          placeholder="e.g. 07XXXXXXXX" required>
 
-        <button class="primary" type="submit">Register</button>
+        <label for="regPassword">Password</label>
+        <input id="regPassword" type="password"
+          placeholder="Create a password" minlength="6" required>
+
+        <button class="primary" type="submit">
+          Register
+        </button>
+
       </form>
 
-      <p id="regMessage" class="success"></p>
-      <p>Already registered? <a href="#" onclick="showPage('login')">Login here</a></p>
+      <p id="regMessage" class="message"></p>
+
+      <p>Already registered?
+        <a href="#" onclick="showPage('loginPage')">Login here</a>
+      </p>
     </div>
   </section>
 
   <!-- LOGIN -->
-  <section id="login" class="hidden">
+  <section id="loginPage" class="page">
     <div class="card">
       <h2>Member Login</h2>
 
       <form id="loginForm">
-        <label>Email address</label>
-        <input id="loginEmail" type="email" required>
 
-        <label>Password</label>
-        <input id="loginPassword" type="password" required>
+        <label for="loginEmail">Email Address</label>
+        <input id="loginEmail" type="email"
+          placeholder="Enter your email" required>
 
-        <button class="primary" type="submit">Login</button>
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password"
+          placeholder="Enter your password" required>
+
+        <button class="primary" type="submit">
+          Login
+        </button>
+
       </form>
 
-      <p id="loginMessage"></p>
-      <p>Don't have an account? <a href="#" onclick="showPage('register')">Register</a></p>
+      <p id="loginMessage" class="message"></p>
+
+      <p>Don't have an account?
+        <a href="#" onclick="showPage('registerPage')">
+          Register here
+        </a>
+      </p>
     </div>
   </section>
 
   <!-- DASHBOARD -->
-  <section id="dashboard" class="hidden">
+  <section id="dashboardPage" class="page">
+
     <div class="card">
       <h2>Member Dashboard</h2>
-      <p>Welcome, <strong id="memberName"></strong>!</p>
-      <p>Your membership status: <strong id="memberStatus">Not paid</strong></p>
+      <p>Welcome, <strong id="memberName">Member</strong></p>
+      <p>Account status:
+        <strong id="memberStatus">Loading...</strong>
+      </p>
     </div>
 
-    <div class="card" id="paymentCard">
-      <h2>Unlock Survey Access</h2>
+    <div class="card">
+      <h3>Membership Access</h3>
+
       <p>One-time access fee: <strong>KSh 50</strong></p>
+
+      <p id="paymentStatus">Checking payment status...</p>
+
       <div class="notice">
-        M-Pesa payments are not connected yet. Do not send money until the official payment integration is configured and tested.
+        M-Pesa payment integration has not yet been configured.
+        Do not send money using an unverified payment instruction.
       </div>
-      <button class="primary" onclick="paymentNotice()">Pay KSh 50 with M-Pesa</button>
-    </div>
 
-    <div class="card hidden" id="surveyArea">
-      <h2>Available Surveys</h2>
-      <div id="surveyList"></div>
+      <button class="primary" disabled>
+        M-Pesa Payment Coming Soon
+      </button>
     </div>
 
     <div class="card">
-      <h2>My Survey History</h2>
-      <div id="history">No surveys submitted yet.</div>
+      <h3>Available Surveys</h3>
+      <div id="surveyList">Loading surveys...</div>
     </div>
-  </section>
 
-  <!-- SURVEY -->
-  <section id="surveyPage" class="hidden">
     <div class="card">
-      <h2 id="surveyTitle">Survey Questions</h2>
-
-      <form id="surveyForm">
-        <div class="question">
-          <p><strong>1. How often do you use the internet?</strong></p>
-          <label><input type="radio" name="q1" value="Daily" required> Daily</label>
-          <label><input type="radio" name="q1" value="Weekly"> Weekly</label>
-          <label><input type="radio" name="q1" value="Rarely"> Rarely</label>
-        </div>
-
-        <div class="question">
-          <p><strong>2. Which device do you mostly use?</strong></p>
-          <label><input type="radio" name="q2" value="Smartphone" required> Smartphone</label>
-          <label><input type="radio" name="q2" value="Computer"> Computer</label>
-          <label><input type="radio" name="q2" value="Tablet"> Tablet</label>
-        </div>
-
-        <div class="question">
-          <p><strong>3. What would improve your online experience?</strong></p>
-          <textarea name="q3" required placeholder="Write your answer"></textarea>
-        </div>
-
-        <button class="primary" type="submit">Submit Answers</button>
-        <button type="button" class="secondary" onclick="showPage('dashboard')">Back to Dashboard</button>
-      </form>
-      <p id="surveyMessage" class="success"></p>
+      <h3>Survey Form</h3>
+      <div id="surveyArea">
+        Select a survey above to view its questions.
+      </div>
     </div>
+
+    <div class="card">
+      <h3>My Response History</h3>
+      <div id="history">Loading history...</div>
+    </div>
+
+    <button id="logoutBtn" class="secondary">
+      Logout
+    </button>
+
+    <p id="dashboardMessage" class="message"></p>
+
   </section>
 
   <!-- ABOUT -->
-  <section id="about" class="hidden">
+  <section id="aboutPage" class="page">
     <div class="card">
       <h2>About SurveyHub Kenya</h2>
-      <p>SurveyHub Kenya is an online questionnaire platform designed to make it easy for registered members to access and complete surveys.</p>
-      <p>Our goal is to provide a simple and user-friendly survey experience.</p>
-      <p>Members pay a one-time KSh 50 access fee. Payment terms and privacy information should be reviewed before registration.</p>
+
+      <p>
+        SurveyHub Kenya is a survey participation platform
+        designed to allow registered members to answer
+        questionnaires and share their opinions.
+      </p>
+
+      <p>
+        Surveys may cover different topics depending on
+        what is published on the platform.
+      </p>
+
+      <p>
+        SurveyHub does not promise employment, earnings,
+        or guaranteed financial rewards for completing surveys.
+      </p>
     </div>
   </section>
 
   <!-- FAQ -->
-  <section id="faq" class="hidden">
+  <section id="faqPage" class="page">
     <div class="card">
       <h2>Frequently Asked Questions</h2>
 
-      <h3>1. How do I join?</h3>
-      <p>Create an account using your name, email and phone number.</p>
-      <br>
+      <h3>1. What is SurveyHub Kenya?</h3>
+      <p>
+        It is a platform for registered members to participate
+        in available surveys.
+      </p>
 
-      <h3>2. How much is registration?</h3>
-      <p>The planned one-time access fee is KSh 50.</p>
-      <br>
+      <h3>2. How much is membership access?</h3>
+      <p>
+        The proposed one-time access fee is KSh 50.
+      </p>
 
-      <h3>3. How do I pay?</h3>
-      <p>M-Pesa integration is still being configured. Do not send money until payment is officially enabled.</p>
-      <br>
+      <h3>3. Will I earn money by answering surveys?</h3>
+      <p>
+        No. Members are not paid for answering surveys.
+      </p>
 
-      <h3>4. Will I earn money by answering surveys?</h3>
-      <p>No earnings are promised by this platform. The current membership fee is for survey access.</p>
-      <br>
+      <h3>4. How do I register?</h3>
+      <p>
+        Open the registration page, enter your details
+        and create an account.
+      </p>
 
-      <h3>5. Can I use my phone?</h3>
-      <p>Yes. The website is designed to work on smartphones and computers.</p>
+      <h3>5. Is M-Pesa payment available?</h3>
+      <p>
+        M-Pesa integration is not yet configured.
+      </p>
+
+      <h3>6. Can I view my previous responses?</h3>
+      <p>
+        Yes. Your submitted responses should appear in
+        the response history in your dashboard.
+      </p>
     </div>
   </section>
 
 </main>
 
 <footer>
-  <h3>SurveyHub Kenya</h3>
-  <p>Making online questionnaires simple and accessible.</p>
   <p>© 2026 SurveyHub Kenya. All rights reserved.</p>
+  <p>Survey participation platform</p>
 </footer>
 
 <script>
-const pages = [
-  "home", "register", "login", "dashboard",
-  "surveyPage", "about", "faq"
-];
+  // ==========================================
+  // SUPABASE CONNECTION
+  // ==========================================
 
-let currentSurvey = "Internet Usage Survey";
+  const SUPABASE_URL =
+    "https://ewbtnttjruvfkogramxt.supabase.co";
 
-function showPage(page) {
-  pages.forEach(id => {
-    document.getElementById(id).classList.add("hidden");
-  });
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable-b-_n6tI5wMX9GK_kAW6Rzg_OTtYhW3C";
 
-  document.getElementById(page).classList.remove("hidden");
-  window.scrollTo(0, 0);
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
-  if (page === "dashboard") {
-    updateDashboard();
+  let currentUser = null;
+  let selectedSurvey = null;
+  let currentQuestions = [];
+
+  // ==========================================
+  // PAGE NAVIGATION
+  // ==========================================
+
+  function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(page => {
+      page.classList.remove("active");
+    });
+
+    document.getElementById(pageId).classList.add("active");
   }
-}
 
-function getAccount() {
-  return JSON.parse(localStorage.getItem("surveyhub_account") || "null");
-}
+  function setMessage(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = "message " + (type || "");
+  }
 
-function getCurrentUser() {
-  return localStorage.getItem("surveyhub_logged_in");
-}
+  // ==========================================
+  // REGISTER
+  // ==========================================
 
-async function registerUser(event) {
-  event.preventDefault();
+  document.getElementById("registerForm")
+    .addEventListener("submit", async function(event) {
 
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim().toLowerCase();
-  const phone = document.getElementById("regPhone").value.trim();
-  const password = document.getElementById("regPassword").value;
-  const message = document.getElementById("regMessage");
+      event.preventDefault();
 
-  message.textContent = "Creating your account...";
+      const fullName =
+        document.getElementById("regName").value.trim();
 
-  const { data, error } = await supabase.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      data: {
-        full_name: name,
-        phone: phone
+      const email =
+        document.getElementById("regEmail").value.trim();
+
+      const phone =
+        document.getElementById("regPhone").value.trim();
+
+      const password =
+        document.getElementById("regPassword").value;
+
+      setMessage("regMessage", "Creating your account...", "");
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: fullName,
+              phone: phone
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.user && !data.session) {
+          setMessage(
+            "regMessage",
+            "Registration successful. Check your email to confirm your account, then log in.",
+            "success"
+          );
+        } else {
+          setMessage(
+            "regMessage",
+            "Account created successfully. You can now log in.",
+            "success"
+          );
+        }
+
+        this.reset();
+
+      } catch (error) {
+        setMessage("regMessage", error.message, "error");
       }
+    });
+
+  // ==========================================
+  // LOGIN
+  // ==========================================
+
+  document.getElementById("loginForm")
+    .addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const email =
+        document.getElementById("loginEmail").value.trim();
+
+      const password =
+        document.getElementById("loginPassword").value;
+
+      setMessage("loginMessage", "Logging in...", "");
+
+      try {
+        const { data, error } =
+          await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+        if (error) throw error;
+
+        currentUser = data.user;
+
+        setMessage("loginMessage", "Login successful.", "success");
+
+        await openDashboard();
+
+      } catch (error) {
+        setMessage("loginMessage", error.message, "error");
+      }
+    });
+
+  // ==========================================
+  // CHECK CURRENT SESSION
+  // ==========================================
+
+  async function checkSession() {
+
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error(error);
+      return;
     }
-  });
 
-  if (error) {
-    message.textContent = error.message;
-    return;
+    currentUser = data.session
+      ? data.session.user
+      : null;
+
+    updateNavigation();
+
+    if (currentUser) {
+      await openDashboard();
+    }
   }
 
-  if (data.session) {
-    message.textContent = "Registration successful! You can now log in.";
-  } else {
-    message.textContent = "Account created. Check your email to confirm your account.";
+  function updateNavigation() {
+    const button = document.getElementById("dashboardNav");
+
+    if (currentUser) {
+      button.classList.remove("hidden");
+    } else {
+      button.classList.add("hidden");
+    }
   }
 
-  document.getElementById("registerForm").reset();
-}
+  // ==========================================
+  // OPEN DASHBOARD
+  // ==========================================
 
-function loginUser(event) {
-  event.preventDefault();
+  async function openDashboard() {
 
-  const account = getAccount();
-  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-  const password = document.getElementById("loginPassword").value;
+    if (!currentUser) {
+      const { data } = await supabase.auth.getUser();
+      currentUser = data.user;
+    }
 
-  if (!account || account.email !== email || account.password !== password) {
-    document.getElementById("loginMessage").textContent =
-      "Incorrect email or password.";
-    return;
+    if (!currentUser) {
+      showPage("loginPage");
+      return;
+    }
+
+    showPage("dashboardPage");
+    updateNavigation();
+
+    await updateDashboard();
+    await loadSurveys();
+    await showHistory();
   }
 
-  localStorage.setItem("surveyhub_logged_in", email);
-  document.getElementById("loginMessage").textContent = "";
-  updateDashboard();
-  showPage("dashboard");
-}
+  // ==========================================
+  // MEMBER PROFILE AND PAYMENT STATUS
+  // ==========================================
 
-function updateDashboard() {
-  const account = getAccount();
-  const loggedIn = getCurrentUser();
+  async function updateDashboard() {
 
-  if (!account || !loggedIn || account.email !== loggedIn) {
-    showPage("login");
-    return;
+    document.getElementById("memberName").textContent =
+      currentUser.user_metadata?.full_name || currentUser.email;
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("full_name, phone, is_admin")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Profile error:", error.message);
+      document.getElementById("memberStatus").textContent =
+        "Profile could not be loaded";
+    } else if (profile) {
+      document.getElementById("memberName").textContent =
+        profile.full_name || currentUser.email;
+
+      document.getElementById("memberStatus").textContent =
+        "Registered member";
+    }
+
+    const { data: payments, error: paymentError } =
+      await supabase
+        .from("payments")
+        .select("status, amount")
+        .eq("user_id", currentUser.id)
+        .eq("status", "confirmed");
+
+    if (paymentError) {
+      document.getElementById("paymentStatus").textContent =
+        "Payment status could not be checked.";
+      return;
+    }
+
+    const isPaid = payments && payments.length > 0;
+
+    document.getElementById("paymentStatus").textContent =
+      isPaid
+        ? "Access payment confirmed."
+        : "Access payment has not been confirmed.";
+
+    document.getElementById("memberStatus").textContent =
+      isPaid ? "Active member" : "Registered - payment pending";
   }
 
-  document.getElementById("memberName").textContent = account.name;
-  document.getElementById("memberStatus").textContent =
-    account.paid ? "Access unlocked" : "Payment required";
+  // ==========================================
+  // LOAD PUBLISHED SURVEYS
+  // ==========================================
 
-  document.getElementById("paymentCard").classList.toggle("hidden", account.paid);
-  document.getElementById("surveyArea").classList.toggle("hidden", !account.paid);
-  document.getElementById("logoutBtn").classList.remove("hidden");
+  async function loadSurveys() {
 
-  if (account.paid) {
-    document.getElementById("surveyList").innerHTML = `
-      <div class="survey">
-        <h3>Internet Usage Survey</h3>
-        <p>Answer a few questions about internet usage.</p>
-        <button class="primary" onclick="openSurvey()">Start Survey</button>
-      </div>
-    `;
+    const area = document.getElementById("surveyList");
+
+    area.textContent = "Loading surveys...";
+
+    const { data: payments, error: paymentError } =
+      await supabase
+        .from("payments")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("status", "confirmed")
+        .limit(1);
+
+    if (paymentError) {
+      area.textContent = "Unable to check membership access.";
+      return;
+    }
+
+    if (!payments || payments.length === 0) {
+      area.innerHTML =
+        "<p>Published surveys will be available after membership access is confirmed.</p>";
+      return;
+    }
+
+    const { data: surveys, error } = await supabase
+      .from("surveys")
+      .select("id, title, description")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      area.textContent = "Could not load surveys: " + error.message;
+      return;
+    }
+
+    if (!surveys || surveys.length === 0) {
+      area.textContent = "There are currently no published surveys.";
+      return;
+    }
+
+    area.innerHTML = "";
+
+    surveys.forEach(survey => {
+
+      const item = document.createElement("div");
+      item.className = "survey-item";
+
+      const title = document.createElement("h3");
+      title.textContent = survey.title;
+
+      const description = document.createElement("p");
+      description.textContent = survey.description || "";
+
+      const button = document.createElement("button");
+      button.className = "primary";
+      button.textContent = "Open Survey";
+
+      button.addEventListener("click", () => {
+        openSurvey(survey);
+      });
+
+      item.appendChild(title);
+      item.appendChild(description);
+      item.appendChild(button);
+
+      area.appendChild(item);
+    });
   }
 
-  showHistory();
-}
+  // ==========================================
+  // OPEN A SURVEY
+  // ==========================================
 
-function paymentNotice() {
-  alert("M-Pesa payment is not connected yet. No payment has been requested or received. The secure payment system must be configured first.");
-}
+  async function openSurvey(survey) {
 
-function openSurvey() {
-  if (!getAccount()?.paid) {
-    alert("Please complete the access payment first.");
-    return;
+    selectedSurvey = survey;
+
+    const area = document.getElementById("surveyArea");
+
+    area.textContent = "Loading survey questions...";
+
+    const { data: payments, error: paymentError } =
+      await supabase
+        .from("payments")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("status", "confirmed")
+        .limit(1);
+
+    if (paymentError || !payments || payments.length === 0) {
+      area.textContent =
+        "Confirmed membership access is required to answer surveys.";
+      return;
+    }
+
+    const { data: questions, error } = await supabase
+      .from("questions")
+      .select("id, question_text, question_type, options")
+      .eq("survey_id", survey.id)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      area.textContent = "Could not load questions: " + error.message;
+      return;
+    }
+
+    if (!questions || questions.length === 0) {
+      area.textContent = "This survey has no questions yet.";
+      return;
+    }
+
+    currentQuestions = questions;
+    renderQuestions();
   }
 
-  document.getElementById("surveyTitle").textContent = currentSurvey;
-  document.getElementById("surveyForm").reset();
-  document.getElementById("surveyMessage").textContent = "";
-  showPage("surveyPage");
-}
+  // ==========================================
+  // DISPLAY SURVEY QUESTIONS
+  // ==========================================
 
-function submitSurvey(event) {
-  event.preventDefault();
+  function renderQuestions() {
 
-  const account = getAccount();
+    const area = document.getElementById("surveyArea");
 
-  if (!account || !account.paid) {
-    alert("You need verified access to submit surveys.");
-    return;
+    area.innerHTML = "";
+
+    const heading = document.createElement("h3");
+    heading.textContent = selectedSurvey.title;
+
+    area.appendChild(heading);
+
+    const form = document.createElement("form");
+    form.id = "dynamicSurveyForm";
+
+    currentQuestions.forEach((question, index) => {
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "question";
+
+      const label = document.createElement("label");
+      label.textContent =
+        (index + 1) + ". " + question.question_text;
+
+      wrapper.appendChild(label);
+
+      const type = (question.question_type || "text").toLowerCase();
+
+      if (type === "multiple_choice" || type === "radio") {
+
+        const options = Array.isArray(question.options)
+          ? question.options
+          : [];
+
+        options.forEach(option => {
+
+          const optionLabel = document.createElement("label");
+          optionLabel.style.fontWeight = "normal";
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "question_" + question.id;
+          input.value = option;
+          input.required = true;
+          input.style.width = "auto";
+          input.style.marginRight = "8px";
+
+          optionLabel.appendChild(input);
+          optionLabel.appendChild(
+            document.createTextNode(option)
+          );
+
+          wrapper.appendChild(optionLabel);
+        });
+
+      } else if (type === "checkbox") {
+
+        const options = Array.isArray(question.options)
+          ? question.options
+          : [];
+
+        options.forEach(option => {
+
+          const optionLabel = document.createElement("label");
+          optionLabel.style.fontWeight = "normal";
+
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.name = "question_" + question.id;
+          input.value = option;
+          input.style.width = "auto";
+          input.style.marginRight = "8px";
+
+          optionLabel.appendChild(input);
+          optionLabel.appendChild(
+            document.createTextNode(option)
+          );
+
+          wrapper.appendChild(optionLabel);
+        });
+
+      } else if (type === "textarea") {
+
+        const input = document.createElement("textarea");
+        input.name = "question_" + question.id;
+        input.required = true;
+
+        wrapper.appendChild(input);
+
+      } else {
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "question_" + question.id;
+        input.required = true;
+
+        wrapper.appendChild(input);
+      }
+
+      form.appendChild(wrapper);
+    });
+
+    const submitButton = document.createElement("button");
+    submitButton.type = "submit";
+    submitButton.className = "primary";
+    submitButton.textContent = "Submit Responses";
+
+    form.appendChild(submitButton);
+
+    form.addEventListener("submit", submitSurvey);
+
+    area.appendChild(form);
   }
 
-  const form = new FormData(event.target);
-  const answers = {
-    survey: currentSurvey,
-    date: new Date().toLocaleString(),
-    q1: form.get("q1"),
-    q2: form.get("q2"),
-    q3: form.get("q3")
-  };
+  // ==========================================
+  // SUBMIT SURVEY RESPONSES
+  // ==========================================
 
-  const history = JSON.parse(
-    localStorage.getItem("surveyhub_history") || "[]"
-  );
+  async function submitSurvey(event) {
 
-  history.push(answers);
-  localStorage.setItem("surveyhub_history", JSON.stringify(history));
+    event.preventDefault();
 
-  document.getElementById("surveyMessage").textContent =
-    "Your answers have been saved on this device.";
+    const form = event.target;
 
-  event.target.reset();
-}
+    const records = [];
 
-function showHistory() {
-  const history = JSON.parse(
-    localStorage.getItem("surveyhub_history") || "[]"
-  );
+    for (const question of currentQuestions) {
 
-  const area = document.getElementById("history");
+      const fieldName = "question_" + question.id;
 
-  if (history.length === 0) {
-    area.textContent = "No surveys submitted yet.";
-    return;
+      const fields = form.querySelectorAll(
+        '[name="' + fieldName + '"]'
+      );
+
+      let answer = "";
+
+      if (fields.length > 0 && fields[0].type === "radio") {
+
+        const selected = form.querySelector(
+          'input[name="' + fieldName + '"]:checked'
+        );
+
+        answer = selected ? selected.value : "";
+
+      } else if (fields.length > 0 &&
+                 fields[0].type === "checkbox") {
+
+        answer = Array.from(fields)
+          .filter(input => input.checked)
+          .map(input => input.value)
+          .join(", ");
+
+        if (!answer) {
+          setMessage(
+            "dashboardMessage",
+            "Please answer all questions.",
+            "error"
+          );
+          return;
+        }
+
+      } else if (fields.length > 0) {
+
+        answer = fields[0].value.trim();
+      }
+
+      if (!answer) {
+        setMessage(
+          "dashboardMessage",
+          "Please answer all questions.",
+          "error"
+        );
+        return;
+      }
+
+      records.push({
+        survey_id: selectedSurvey.id,
+        question_id: question.id,
+        user_id: currentUser.id,
+        answer: answer
+      });
+    }
+
+    const submitButton = form.querySelector(
+      'button[type="submit"]'
+    );
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    const { error } = await supabase
+      .from("responses")
+      .insert(records);
+
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit Responses";
+
+    if (error) {
+      setMessage(
+        "dashboardMessage",
+        "Submission failed: " + error.message,
+        "error"
+      );
+      return;
+    }
+
+    setMessage(
+      "dashboardMessage",
+      "Your survey responses have been submitted successfully.",
+      "success"
+    );
+
+    document.getElementById("surveyArea").textContent =
+      "Thank you for completing this survey.";
+
+    await showHistory();
   }
 
-  area.innerHTML = history.map(item => `
-    <div class="survey">
-      <strong>${escapeText(item.survey)}</strong>
-      <p>Submitted: ${escapeText(item.date)}</p>
-    </div>
-  `).join("");
-}
+  // ==========================================
+  // RESPONSE HISTORY
+  // ==========================================
 
-function escapeText(value) {
-  const div = document.createElement("div");
-  div.textContent = String(value);
-  return div.innerHTML;
-}
+  async function showHistory() {
 
-function logout() {
-  localStorage.removeItem("surveyhub_logged_in");
-  document.getElementById("logoutBtn").classList.add("hidden");
-  showPage("home");
-}
+    const area = document.getElementById("history");
 
-document.getElementById("registerForm")
-  .addEventListener("submit", registerUser);
+    area.textContent = "Loading your response history...";
 
-document.getElementById("loginForm")
-  .addEventListener("submit", loginUser);
+    const { data: responses, error } = await supabase
+      .from("responses")
+      .select("survey_id, answer, created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false });
 
-document.getElementById("surveyForm")
-  .addEventListener("submit", submitSurvey);
+    if (error) {
+      area.textContent =
+        "Could not load history: " + error.message;
+      return;
+    }
 
-if (getCurrentUser()) {
-  showPage("dashboard");
-} else {
-  showPage("home");
-}
+    if (!responses || responses.length === 0) {
+      area.textContent = "You have not submitted any surveys yet.";
+      return;
+    }
+
+    const surveyIds = [
+      ...new Set(responses.map(item => item.survey_id))
+    ];
+
+    const { data: surveys, error: surveyError } = await supabase
+      .from("surveys")
+      .select("id, title")
+      .in("id", surveyIds);
+
+    if (surveyError) {
+      area.textContent = "Could not load survey titles.";
+      return;
+    }
+
+    const titleMap = {};
+
+    (surveys || []).forEach(survey => {
+      titleMap[survey.id] = survey.title;
+    });
+
+    area.innerHTML = "";
+
+    responses.forEach(response => {
+
+      const item = document.createElement("div");
+      item.className = "survey-item";
+
+      const title = document.createElement("strong");
+      title.textContent =
+        titleMap[response.survey_id] || "Survey response";
+
+      const answer = document.createElement("p");
+      answer.textContent = "Answer: " + response.answer;
+
+      const date = document.createElement("small");
+      date.textContent =
+        "Submitted: " +
+        new Date(response.created_at).toLocaleString();
+
+      item.appendChild(title);
+      item.appendChild(answer);
+      item.appendChild(date);
+
+      area.appendChild(item);
+    });
+  }
+
+  // ==========================================
+  // LOGOUT
+  // ==========================================
+
+  document.getElementById("logoutBtn")
+    .addEventListener("click", async function() {
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        setMessage(
+          "dashboardMessage",
+          error.message,
+          "error"
+        );
+        return;
+      }
+
+      currentUser = null;
+      selectedSurvey = null;
+      currentQuestions = [];
+
+      updateNavigation();
+
+      showPage("homePage");
+    });
+
+  // ==========================================
+  // START APPLICATION
+  // ==========================================
+
+  checkSession();
+
 </script>
-const SUPABASE_URL = "https://ewbtnttjruvfkogramxt.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_b-_n6tI5wMX9GK_kAW6Rzg_OTtYhW3C";
 
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
 </body>
 </html>
