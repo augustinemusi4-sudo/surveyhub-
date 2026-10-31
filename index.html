@@ -1,12 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#075b3b">
   <title>SurveyHub Kenya</title>
-
-  <!-- Supabase library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -61,6 +60,7 @@
       width: 92%;
       max-width: 1000px;
       margin: 25px auto;
+      min-height: 60vh;
     }
 
     .page {
@@ -81,6 +81,7 @@
     }
 
     .hero h2 {
+      color: white;
       font-size: 30px;
       margin-bottom: 12px;
     }
@@ -102,6 +103,10 @@
       margin-bottom: 14px;
     }
 
+    p {
+      margin-bottom: 8px;
+    }
+
     input, textarea, select {
       width: 100%;
       padding: 12px;
@@ -111,10 +116,20 @@
       font-size: 15px;
     }
 
+    input[type="radio"],
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0 8px 0 0;
+    }
+
     label {
       font-weight: bold;
       display: block;
       margin-top: 8px;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     button.primary {
@@ -123,7 +138,6 @@
       border: none;
       padding: 12px 18px;
       border-radius: 5px;
-      cursor: pointer;
       font-size: 15px;
     }
 
@@ -137,7 +151,6 @@
       border: none;
       padding: 10px 15px;
       border-radius: 5px;
-      cursor: pointer;
     }
 
     button:disabled {
@@ -180,10 +193,18 @@
 
     .question {
       margin: 18px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
     }
 
     .question label {
       margin-bottom: 8px;
+    }
+
+    .question-option {
+      font-weight: normal;
+      display: block;
+      margin: 10px 0;
     }
 
     footer {
@@ -194,8 +215,16 @@
       margin-top: 40px;
     }
 
+    footer p {
+      margin: 4px 0;
+    }
+
     .hidden {
       display: none !important;
+    }
+
+    a {
+      color: #087747;
     }
 
     @media (max-width: 600px) {
@@ -230,13 +259,13 @@
   <h1>SurveyHub Kenya</h1>
 
   <nav>
-    <button onclick="showPage('homePage')">Home</button>
-    <button onclick="showPage('aboutPage')">About</button>
-    <button onclick="showPage('faqPage')">FAQs</button>
-    <button onclick="showPage('registerPage')">Register</button>
-    <button onclick="showPage('loginPage')">Login</button>
-    <button id="dashboardNav" class="hidden"
-      onclick="openDashboard()">Dashboard</button>
+    <button type="button" onclick="showPage('homePage')">Home</button>
+    <button type="button" onclick="showPage('aboutPage')">About</button>
+    <button type="button" onclick="showPage('faqPage')">FAQs</button>
+    <button type="button" onclick="showPage('registerPage')">Register</button>
+    <button type="button" onclick="showPage('loginPage')">Login</button>
+    <button type="button" id="dashboardNav"
+      class="hidden" onclick="openDashboard()">Dashboard</button>
   </nav>
 </header>
 
@@ -251,7 +280,8 @@
         A platform where registered members can participate
         in available surveys and share their opinions.
       </p>
-      <button class="primary"
+
+      <button type="button" class="primary"
         onclick="showPage('registerPage')">
         Get Started
       </button>
@@ -261,17 +291,16 @@
       <h2>How SurveyHub Works</h2>
       <p>1. Create your account.</p>
       <p>2. Access the member dashboard.</p>
-      <p>3. Complete the required access payment when payment
-        integration is available.</p>
-      <p>4. Participate in published surveys.</p>
+      <p>3. Review the membership access information.</p>
+      <p>4. Participate in published surveys when eligible.</p>
       <p>5. View your submitted survey responses.</p>
     </div>
 
     <div class="notice">
-      <strong>Important:</strong> SurveyHub currently charges a
-      proposed one-time access fee of KSh 50. Members are not paid
-      for answering surveys. Registration or payment does not
-      guarantee income or employment.
+      <strong>Important:</strong> SurveyHub proposes a one-time
+      access fee of KSh 50. Members are not paid for answering
+      surveys. Registration or payment does not guarantee income
+      or employment. Payment is not currently available.
     </div>
 
   </section>
@@ -299,16 +328,18 @@
         <input id="regPassword" type="password"
           placeholder="Create a password" minlength="6" required>
 
-        <button class="primary" type="submit">
+        <button class="primary" type="submit" id="registerButton">
           Register
         </button>
 
       </form>
 
-      <p id="regMessage" class="message"></p>
+      <p id="regMessage" class="message" aria-live="polite"></p>
 
       <p>Already registered?
-        <a href="#" onclick="showPage('loginPage')">Login here</a>
+        <a href="#" onclick="showPage('loginPage'); return false;">
+          Login here
+        </a>
       </p>
     </div>
   </section>
@@ -328,16 +359,16 @@
         <input id="loginPassword" type="password"
           placeholder="Enter your password" required>
 
-        <button class="primary" type="submit">
+        <button class="primary" type="submit" id="loginButton">
           Login
         </button>
 
       </form>
 
-      <p id="loginMessage" class="message"></p>
+      <p id="loginMessage" class="message" aria-live="polite"></p>
 
       <p>Don't have an account?
-        <a href="#" onclick="showPage('registerPage')">
+        <a href="#" onclick="showPage('registerPage'); return false;">
           Register here
         </a>
       </p>
@@ -357,17 +388,17 @@
 
     <div class="card">
       <h3>Membership Access</h3>
-
-      <p>One-time access fee: <strong>KSh 50</strong></p>
+      <p>Proposed one-time access fee: <strong>KSh 50</strong></p>
 
       <p id="paymentStatus">Checking payment status...</p>
 
       <div class="notice">
-        M-Pesa payment integration has not yet been configured.
-        Do not send money using an unverified payment instruction.
+        M-Pesa integration has not yet been configured.
+        Do not send money until a secure payment process is
+        implemented and tested.
       </div>
 
-      <button class="primary" disabled>
+      <button type="button" class="primary" disabled>
         M-Pesa Payment Coming Soon
       </button>
     </div>
@@ -389,11 +420,11 @@
       <div id="history">Loading history...</div>
     </div>
 
-    <button id="logoutBtn" class="secondary">
+    <button type="button" id="logoutBtn" class="secondary">
       Logout
     </button>
 
-    <p id="dashboardMessage" class="message"></p>
+    <p id="dashboardMessage" class="message" aria-live="polite"></p>
 
   </section>
 
@@ -426,37 +457,25 @@
       <h2>Frequently Asked Questions</h2>
 
       <h3>1. What is SurveyHub Kenya?</h3>
-      <p>
-        It is a platform for registered members to participate
-        in available surveys.
-      </p>
+      <p>It is a platform for registered members to participate
+        in available surveys.</p>
 
       <h3>2. How much is membership access?</h3>
-      <p>
-        The proposed one-time access fee is KSh 50.
-      </p>
+      <p>The proposed one-time access fee is KSh 50.</p>
 
       <h3>3. Will I earn money by answering surveys?</h3>
-      <p>
-        No. Members are not paid for answering surveys.
-      </p>
+      <p>No. Members are not paid for answering surveys.</p>
 
       <h3>4. How do I register?</h3>
-      <p>
-        Open the registration page, enter your details
-        and create an account.
-      </p>
+      <p>Open the registration page, enter your details
+        and create an account.</p>
 
       <h3>5. Is M-Pesa payment available?</h3>
-      <p>
-        M-Pesa integration is not yet configured.
-      </p>
+      <p>No. M-Pesa integration is not yet configured.</p>
 
       <h3>6. Can I view my previous responses?</h3>
-      <p>
-        Yes. Your submitted responses should appear in
-        the response history in your dashboard.
-      </p>
+      <p>Yes. Submitted responses should appear in your
+        dashboard response history.</p>
     </div>
   </section>
 
@@ -467,151 +486,273 @@
   <p>Survey participation platform</p>
 </footer>
 
+<!-- Supabase library -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
 <script>
-  // ==========================================
-  // SUPABASE CONNECTION
-  // ==========================================
+"use strict";
 
-  const SUPABASE_URL =
-    "https://ewbtnttjruvfkogramxt.supabase.co";
+// ==========================================
+// SUPABASE CONFIGURATION
+// ==========================================
 
-  const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable-b-_n6tI5wMX9GK_kAW6Rzg_OTtYhW3C";
+const SUPABASE_URL =
+  "https://ewbtnttjruvfkogramxt.supabase.co";
 
-  const supabase = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable-b-_n6tI5wMX9GK_kAW6Rzg_OTtYhW3C";
 
-  let currentUser = null;
-  let selectedSurvey = null;
-  let currentQuestions = [];
+let supabaseClient = null;
+let currentUser = null;
+let selectedSurvey = null;
+let currentQuestions = [];
+let appReady = false;
 
-  // ==========================================
-  // PAGE NAVIGATION
-  // ==========================================
+// ==========================================
+// GENERAL HELPERS
+// ==========================================
 
-  function showPage(pageId) {
-    document.querySelectorAll(".page").forEach(page => {
-      page.classList.remove("active");
-    });
+function setMessage(elementId, message, type = "") {
+  const element = document.getElementById(elementId);
 
-    document.getElementById(pageId).classList.add("active");
+  if (!element) return;
+
+  element.textContent = message;
+  element.className = "message " + type;
+}
+
+function showPage(pageId) {
+  const target = document.getElementById(pageId);
+
+  if (!target) {
+    console.error("Page not found:", pageId);
+    return;
   }
 
-  function setMessage(elementId, message, type) {
-    const element = document.getElementById(elementId);
-    element.textContent = message;
-    element.className = "message " + (type || "");
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  target.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function setButtonLoading(buttonId, loading, loadingText) {
+  const button = document.getElementById(buttonId);
+
+  if (!button) return;
+
+  if (loading) {
+    button.dataset.originalText = button.textContent;
+    button.textContent = loadingText;
+    button.disabled = true;
+  } else {
+    button.textContent =
+      button.dataset.originalText || button.textContent;
+    button.disabled = false;
+  }
+}
+
+function showConnectionError(message) {
+  console.error(message);
+
+  const dashboardMessage =
+    document.getElementById("dashboardMessage");
+
+  if (dashboardMessage) {
+    setMessage(
+      "dashboardMessage",
+      message,
+      "error"
+    );
+  }
+}
+
+// ==========================================
+// INITIALIZE SUPABASE
+// ==========================================
+
+function initializeSupabase() {
+  if (!window.supabase ||
+      typeof window.supabase.createClient !== "function") {
+    showConnectionError(
+      "Supabase library failed to load. Check your internet connection and reload the page."
+    );
+    return false;
   }
 
-  // ==========================================
-  // REGISTER
-  // ==========================================
+  try {
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
 
-  document.getElementById("registerForm")
-    .addEventListener("submit", async function(event) {
+    appReady = true;
+    return true;
+  } catch (error) {
+    showConnectionError(
+      "Supabase connection could not be initialized: " +
+      error.message
+    );
+    return false;
+  }
+}
 
-      event.preventDefault();
+// ==========================================
+// REGISTRATION
+// ==========================================
 
-      const fullName =
-        document.getElementById("regName").value.trim();
+document.getElementById("registerForm")
+  .addEventListener("submit", async function(event) {
 
-      const email =
-        document.getElementById("regEmail").value.trim();
+    event.preventDefault();
 
-      const phone =
-        document.getElementById("regPhone").value.trim();
+    if (!appReady) {
+      setMessage(
+        "regMessage",
+        "The database connection is not ready. Reload and try again.",
+        "error"
+      );
+      return;
+    }
 
-      const password =
-        document.getElementById("regPassword").value;
+    const fullName =
+      document.getElementById("regName").value.trim();
 
-      setMessage("regMessage", "Creating your account...", "");
+    const email =
+      document.getElementById("regEmail").value.trim();
 
-      try {
-        const { data, error } = await supabase.auth.signUp({
-          email: email,
-          password: password,
+    const phone =
+      document.getElementById("regPhone").value.trim();
+
+    const password =
+      document.getElementById("regPassword").value;
+
+    if (!fullName || !email || !phone || !password) {
+      setMessage(
+        "regMessage",
+        "Please complete all fields.",
+        "error"
+      );
+      return;
+    }
+
+    setButtonLoading("registerButton", true, "Creating account...");
+    setMessage("regMessage", "Please wait...", "");
+
+    try {
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email,
+          password,
           options: {
             data: {
               full_name: fullName,
-              phone: phone
+              phone
             }
           }
         });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data.user && !data.session) {
-          setMessage(
-            "regMessage",
-            "Registration successful. Check your email to confirm your account, then log in.",
-            "success"
-          );
-        } else {
-          setMessage(
-            "regMessage",
-            "Account created successfully. You can now log in.",
-            "success"
-          );
-        }
-
-        this.reset();
-
-      } catch (error) {
-        setMessage("regMessage", error.message, "error");
+      if (data.user && !data.session) {
+        setMessage(
+          "regMessage",
+          "Registration successful. Check your email to confirm your account, then log in.",
+          "success"
+        );
+      } else {
+        setMessage(
+          "regMessage",
+          "Your account has been created successfully.",
+          "success"
+        );
       }
-    });
 
-  // ==========================================
-  // LOGIN
-  // ==========================================
+      this.reset();
 
-  document.getElementById("loginForm")
-    .addEventListener("submit", async function(event) {
+    } catch (error) {
+      setMessage(
+        "regMessage",
+        "Registration failed: " + error.message,
+        "error"
+      );
+    } finally {
+      setButtonLoading("registerButton", false);
+    }
+  });
 
-      event.preventDefault();
+// ==========================================
+// LOGIN
+// ==========================================
 
-      const email =
-        document.getElementById("loginEmail").value.trim();
+document.getElementById("loginForm")
+  .addEventListener("submit", async function(event) {
 
-      const password =
-        document.getElementById("loginPassword").value;
+    event.preventDefault();
 
-      setMessage("loginMessage", "Logging in...", "");
-
-      try {
-        const { data, error } =
-          await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
-
-        if (error) throw error;
-
-        currentUser = data.user;
-
-        setMessage("loginMessage", "Login successful.", "success");
-
-        await openDashboard();
-
-      } catch (error) {
-        setMessage("loginMessage", error.message, "error");
-      }
-    });
-
-  // ==========================================
-  // CHECK CURRENT SESSION
-  // ==========================================
-
-  async function checkSession() {
-
-    const { data, error } = await supabase.auth.getSession();
-
-    if (error) {
-      console.error(error);
+    if (!appReady) {
+      setMessage(
+        "loginMessage",
+        "The database connection is not ready. Reload and try again.",
+        "error"
+      );
       return;
     }
+
+    const email =
+      document.getElementById("loginEmail").value.trim();
+
+    const password =
+      document.getElementById("loginPassword").value;
+
+    setButtonLoading("loginButton", true, "Logging in...");
+    setMessage("loginMessage", "Please wait...", "");
+
+    try {
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      currentUser = data.user;
+
+      setMessage(
+        "loginMessage",
+        "Login successful.",
+        "success"
+      );
+
+      await openDashboard();
+
+    } catch (error) {
+      setMessage(
+        "loginMessage",
+        "Login failed: " + error.message,
+        "error"
+      );
+    } finally {
+      setButtonLoading("loginButton", false);
+    }
+  });
+
+// ==========================================
+// SESSION MANAGEMENT
+// ==========================================
+
+async function checkSession() {
+  if (!appReady) return;
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.getSession();
+
+    if (error) throw error;
 
     currentUser = data.session
       ? data.session.user
@@ -622,26 +763,39 @@
     if (currentUser) {
       await openDashboard();
     }
+
+  } catch (error) {
+    console.error("Session error:", error);
+  }
+}
+
+function updateNavigation() {
+  const button = document.getElementById("dashboardNav");
+
+  if (currentUser) {
+    button.classList.remove("hidden");
+  } else {
+    button.classList.add("hidden");
+  }
+}
+
+// ==========================================
+// OPEN DASHBOARD
+// ==========================================
+
+async function openDashboard() {
+  if (!appReady) {
+    showPage("loginPage");
+    return;
   }
 
-  function updateNavigation() {
-    const button = document.getElementById("dashboardNav");
-
-    if (currentUser) {
-      button.classList.remove("hidden");
-    } else {
-      button.classList.add("hidden");
-    }
-  }
-
-  // ==========================================
-  // OPEN DASHBOARD
-  // ==========================================
-
-  async function openDashboard() {
-
+  try {
     if (!currentUser) {
-      const { data } = await supabase.auth.getUser();
+      const { data, error } =
+        await supabaseClient.auth.getUser();
+
+      if (error) throw error;
+
       currentUser = data.user;
     }
 
@@ -653,111 +807,157 @@
     showPage("dashboardPage");
     updateNavigation();
 
+    document.getElementById("memberName").textContent =
+      currentUser.user_metadata?.full_name ||
+      currentUser.email ||
+      "Member";
+
     await updateDashboard();
     await loadSurveys();
     await showHistory();
+
+  } catch (error) {
+    showConnectionError(
+      "Could not open dashboard: " + error.message
+    );
   }
+}
 
-  // ==========================================
-  // MEMBER PROFILE AND PAYMENT STATUS
-  // ==========================================
+// ==========================================
+// PROFILE AND PAYMENT STATUS
+// ==========================================
 
-  async function updateDashboard() {
+async function updateDashboard() {
+  if (!currentUser) return;
 
-    document.getElementById("memberName").textContent =
-      currentUser.user_metadata?.full_name || currentUser.email;
+  const memberName =
+    document.getElementById("memberName");
 
-    const { data: profile, error } = await supabase
+  const memberStatus =
+    document.getElementById("memberStatus");
+
+  const paymentStatus =
+    document.getElementById("paymentStatus");
+
+  memberName.textContent =
+    currentUser.user_metadata?.full_name ||
+    currentUser.email ||
+    "Member";
+
+  memberStatus.textContent = "Checking account...";
+
+  const { data: profile, error: profileError } =
+    await supabaseClient
       .from("profiles")
       .select("full_name, phone, is_admin")
       .eq("id", currentUser.id)
       .maybeSingle();
 
-    if (error) {
-      console.error("Profile error:", error.message);
-      document.getElementById("memberStatus").textContent =
-        "Profile could not be loaded";
-    } else if (profile) {
-      document.getElementById("memberName").textContent =
-        profile.full_name || currentUser.email;
+  if (profileError) {
+    console.error("Profile error:", profileError.message);
+    memberStatus.textContent = "Profile could not be loaded";
+  } else if (profile) {
+    memberName.textContent =
+      profile.full_name || currentUser.email;
 
-      document.getElementById("memberStatus").textContent =
-        "Registered member";
-    }
-
-    const { data: payments, error: paymentError } =
-      await supabase
-        .from("payments")
-        .select("status, amount")
-        .eq("user_id", currentUser.id)
-        .eq("status", "confirmed");
-
-    if (paymentError) {
-      document.getElementById("paymentStatus").textContent =
-        "Payment status could not be checked.";
-      return;
-    }
-
-    const isPaid = payments && payments.length > 0;
-
-    document.getElementById("paymentStatus").textContent =
-      isPaid
-        ? "Access payment confirmed."
-        : "Access payment has not been confirmed.";
-
-    document.getElementById("memberStatus").textContent =
-      isPaid ? "Active member" : "Registered - payment pending";
+    memberStatus.textContent = "Registered member";
+  } else {
+    memberStatus.textContent = "Profile not found";
   }
 
-  // ==========================================
-  // LOAD PUBLISHED SURVEYS
-  // ==========================================
+  const { data: payments, error: paymentError } =
+    await supabaseClient
+      .from("payments")
+      .select("status, amount")
+      .eq("user_id", currentUser.id)
+      .eq("status", "confirmed")
+      .limit(1);
 
-  async function loadSurveys() {
+  if (paymentError) {
+    paymentStatus.textContent =
+      "Payment status could not be checked.";
 
-    const area = document.getElementById("surveyList");
+    console.error("Payment error:", paymentError.message);
+    return;
+  }
+
+  const isPaid = payments && payments.length > 0;
+
+  paymentStatus.textContent = isPaid
+    ? "Access payment confirmed."
+    : "Access payment has not been confirmed.";
+
+  memberStatus.textContent = isPaid
+    ? "Active member"
+    : "Registered - payment pending";
+}
+
+// ==========================================
+// CHECK MEMBERSHIP ACCESS
+// ==========================================
+
+async function hasConfirmedPayment() {
+  if (!currentUser) return false;
+
+  const { data, error } =
+    await supabaseClient
+      .from("payments")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .eq("status", "confirmed")
+      .limit(1);
+
+  if (error) {
+    console.error("Membership check:", error.message);
+    throw error;
+  }
+
+  return Array.isArray(data) && data.length > 0;
+}
+
+// ==========================================
+// LOAD PUBLISHED SURVEYS
+// ==========================================
+
+async function loadSurveys() {
+  const area = document.getElementById("surveyList");
+
+  area.textContent = "Checking membership access...";
+
+  if (!currentUser) {
+    area.textContent = "Please log in to view surveys.";
+    return;
+  }
+
+  try {
+    const isPaid = await hasConfirmedPayment();
+
+    if (!isPaid) {
+      area.textContent =
+        "Published surveys will be available after membership access is confirmed.";
+      return;
+    }
 
     area.textContent = "Loading surveys...";
 
-    const { data: payments, error: paymentError } =
-      await supabase
-        .from("payments")
-        .select("id")
-        .eq("user_id", currentUser.id)
-        .eq("status", "confirmed")
-        .limit(1);
+    const { data: surveys, error } =
+      await supabaseClient
+        .from("surveys")
+        .select("id, title, description")
+        .eq("is_published", true)
+        .order("created_at", { ascending: false });
 
-    if (paymentError) {
-      area.textContent = "Unable to check membership access.";
-      return;
-    }
-
-    if (!payments || payments.length === 0) {
-      area.innerHTML =
-        "<p>Published surveys will be available after membership access is confirmed.</p>";
-      return;
-    }
-
-    const { data: surveys, error } = await supabase
-      .from("surveys")
-      .select("id, title, description")
-      .eq("is_published", true)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      area.textContent = "Could not load surveys: " + error.message;
-      return;
-    }
+    if (error) throw error;
 
     if (!surveys || surveys.length === 0) {
-      area.textContent = "There are currently no published surveys.";
+      area.textContent =
+        "There are currently no published surveys.";
       return;
     }
 
     area.innerHTML = "";
 
     surveys.forEach(survey => {
-
       const item = document.createElement("div");
       item.className = "survey-item";
 
@@ -768,6 +968,7 @@
       description.textContent = survey.description || "";
 
       const button = document.createElement("button");
+      button.type = "button";
       button.className = "primary";
       button.textContent = "Open Survey";
 
@@ -781,44 +982,47 @@
 
       area.appendChild(item);
     });
+
+  } catch (error) {
+    area.textContent =
+      "Could not load surveys: " + error.message;
+  }
+}
+
+// ==========================================
+// OPEN SURVEY
+// ==========================================
+
+async function openSurvey(survey) {
+  if (!currentUser) {
+    showPage("loginPage");
+    return;
   }
 
-  // ==========================================
-  // OPEN A SURVEY
-  // ==========================================
+  selectedSurvey = survey;
 
-  async function openSurvey(survey) {
+  const area = document.getElementById("surveyArea");
+  area.textContent = "Checking access...";
 
-    selectedSurvey = survey;
+  try {
+    const isPaid = await hasConfirmedPayment();
 
-    const area = document.getElementById("surveyArea");
-
-    area.textContent = "Loading survey questions...";
-
-    const { data: payments, error: paymentError } =
-      await supabase
-        .from("payments")
-        .select("id")
-        .eq("user_id", currentUser.id)
-        .eq("status", "confirmed")
-        .limit(1);
-
-    if (paymentError || !payments || payments.length === 0) {
+    if (!isPaid) {
       area.textContent =
         "Confirmed membership access is required to answer surveys.";
       return;
     }
 
-    const { data: questions, error } = await supabase
-      .from("questions")
-      .select("id, question_text, question_type, options")
-      .eq("survey_id", survey.id)
-      .order("created_at", { ascending: true });
+    area.textContent = "Loading survey questions...";
 
-    if (error) {
-      area.textContent = "Could not load questions: " + error.message;
-      return;
-    }
+    const { data: questions, error } =
+      await supabaseClient
+        .from("questions")
+        .select("id, question_text, question_type, options")
+        .eq("survey_id", survey.id)
+        .order("created_at", { ascending: true });
+
+    if (error) throw error;
 
     if (!questions || questions.length === 0) {
       area.textContent = "This survey has no questions yet.";
@@ -827,216 +1031,198 @@
 
     currentQuestions = questions;
     renderQuestions();
+
+  } catch (error) {
+    area.textContent =
+      "Could not open survey: " + error.message;
   }
+}
 
-  // ==========================================
-  // DISPLAY SURVEY QUESTIONS
-  // ==========================================
+// ==========================================
+// DISPLAY SURVEY QUESTIONS
+// ==========================================
 
-  function renderQuestions() {
+function renderQuestions() {
+  const area = document.getElementById("surveyArea");
+  area.innerHTML = "";
 
-    const area = document.getElementById("surveyArea");
+  const heading = document.createElement("h3");
+  heading.textContent = selectedSurvey.title;
+  area.appendChild(heading);
 
-    area.innerHTML = "";
+  const form = document.createElement("form");
+  form.id = "dynamicSurveyForm";
 
-    const heading = document.createElement("h3");
-    heading.textContent = selectedSurvey.title;
+  currentQuestions.forEach((question, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "question";
 
-    area.appendChild(heading);
+    const label = document.createElement("label");
+    label.textContent =
+      (index + 1) + ". " + question.question_text;
 
-    const form = document.createElement("form");
-    form.id = "dynamicSurveyForm";
+    wrapper.appendChild(label);
 
-    currentQuestions.forEach((question, index) => {
+    const type =
+      (question.question_type || "text").toLowerCase();
 
-      const wrapper = document.createElement("div");
-      wrapper.className = "question";
+    if (
+      type === "multiple_choice" ||
+      type === "radio" ||
+      type === "checkbox"
+    ) {
+      const options = Array.isArray(question.options)
+        ? question.options
+        : [];
 
-      const label = document.createElement("label");
-      label.textContent =
-        (index + 1) + ". " + question.question_text;
+      if (options.length === 0) {
+        const warning = document.createElement("p");
+        warning.textContent = "No answer options have been added.";
+        wrapper.appendChild(warning);
+      }
 
-      wrapper.appendChild(label);
-
-      const type = (question.question_type || "text").toLowerCase();
-
-      if (type === "multiple_choice" || type === "radio") {
-
-        const options = Array.isArray(question.options)
-          ? question.options
-          : [];
-
-        options.forEach(option => {
-
-          const optionLabel = document.createElement("label");
-          optionLabel.style.fontWeight = "normal";
-
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = "question_" + question.id;
-          input.value = option;
-          input.required = true;
-          input.style.width = "auto";
-          input.style.marginRight = "8px";
-
-          optionLabel.appendChild(input);
-          optionLabel.appendChild(
-            document.createTextNode(option)
-          );
-
-          wrapper.appendChild(optionLabel);
-        });
-
-      } else if (type === "checkbox") {
-
-        const options = Array.isArray(question.options)
-          ? question.options
-          : [];
-
-        options.forEach(option => {
-
-          const optionLabel = document.createElement("label");
-          optionLabel.style.fontWeight = "normal";
-
-          const input = document.createElement("input");
-          input.type = "checkbox";
-          input.name = "question_" + question.id;
-          input.value = option;
-          input.style.width = "auto";
-          input.style.marginRight = "8px";
-
-          optionLabel.appendChild(input);
-          optionLabel.appendChild(
-            document.createTextNode(option)
-          );
-
-          wrapper.appendChild(optionLabel);
-        });
-
-      } else if (type === "textarea") {
-
-        const input = document.createElement("textarea");
-        input.name = "question_" + question.id;
-        input.required = true;
-
-        wrapper.appendChild(input);
-
-      } else {
+      options.forEach(option => {
+        const optionLabel = document.createElement("label");
+        optionLabel.className = "question-option";
 
         const input = document.createElement("input");
-        input.type = "text";
+        input.type =
+          type === "checkbox" ? "checkbox" : "radio";
+
         input.name = "question_" + question.id;
-        input.required = true;
+        input.value = String(option);
+        input.required = type !== "checkbox";
 
-        wrapper.appendChild(input);
-      }
-
-      form.appendChild(wrapper);
-    });
-
-    const submitButton = document.createElement("button");
-    submitButton.type = "submit";
-    submitButton.className = "primary";
-    submitButton.textContent = "Submit Responses";
-
-    form.appendChild(submitButton);
-
-    form.addEventListener("submit", submitSurvey);
-
-    area.appendChild(form);
-  }
-
-  // ==========================================
-  // SUBMIT SURVEY RESPONSES
-  // ==========================================
-
-  async function submitSurvey(event) {
-
-    event.preventDefault();
-
-    const form = event.target;
-
-    const records = [];
-
-    for (const question of currentQuestions) {
-
-      const fieldName = "question_" + question.id;
-
-      const fields = form.querySelectorAll(
-        '[name="' + fieldName + '"]'
-      );
-
-      let answer = "";
-
-      if (fields.length > 0 && fields[0].type === "radio") {
-
-        const selected = form.querySelector(
-          'input[name="' + fieldName + '"]:checked'
+        optionLabel.appendChild(input);
+        optionLabel.appendChild(
+          document.createTextNode(String(option))
         );
 
-        answer = selected ? selected.value : "";
-
-      } else if (fields.length > 0 &&
-                 fields[0].type === "checkbox") {
-
-        answer = Array.from(fields)
-          .filter(input => input.checked)
-          .map(input => input.value)
-          .join(", ");
-
-        if (!answer) {
-          setMessage(
-            "dashboardMessage",
-            "Please answer all questions.",
-            "error"
-          );
-          return;
-        }
-
-      } else if (fields.length > 0) {
-
-        answer = fields[0].value.trim();
-      }
-
-      if (!answer) {
-        setMessage(
-          "dashboardMessage",
-          "Please answer all questions.",
-          "error"
-        );
-        return;
-      }
-
-      records.push({
-        survey_id: selectedSurvey.id,
-        question_id: question.id,
-        user_id: currentUser.id,
-        answer: answer
+        wrapper.appendChild(optionLabel);
       });
+
+    } else if (type === "textarea") {
+      const input = document.createElement("textarea");
+      input.name = "question_" + question.id;
+      input.required = true;
+
+      wrapper.appendChild(input);
+
+    } else {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.name = "question_" + question.id;
+      input.required = true;
+
+      wrapper.appendChild(input);
     }
 
-    const submitButton = form.querySelector(
-      'button[type="submit"]'
+    form.appendChild(wrapper);
+  });
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.className = "primary";
+  submitButton.textContent = "Submit Responses";
+
+  form.appendChild(submitButton);
+  form.addEventListener("submit", submitSurvey);
+
+  area.appendChild(form);
+}
+
+// ==========================================
+// SUBMIT SURVEY RESPONSES
+// ==========================================
+
+async function submitSurvey(event) {
+  event.preventDefault();
+
+  if (!currentUser || !selectedSurvey) {
+    setMessage(
+      "dashboardMessage",
+      "Please log in and select a survey first.",
+      "error"
+    );
+    return;
+  }
+
+  const form = event.target;
+  const records = [];
+
+  for (const question of currentQuestions) {
+    const fieldName = "question_" + question.id;
+
+    const fields = form.querySelectorAll(
+      '[name="' + fieldName + '"]'
     );
 
-    submitButton.disabled = true;
-    submitButton.textContent = "Submitting...";
+    let answer = "";
 
-    const { error } = await supabase
-      .from("responses")
-      .insert(records);
-
-    submitButton.disabled = false;
-    submitButton.textContent = "Submit Responses";
-
-    if (error) {
+    if (fields.length === 0) {
       setMessage(
         "dashboardMessage",
-        "Submission failed: " + error.message,
+        "A question is missing its answer field.",
         "error"
       );
       return;
     }
+
+    if (fields[0].type === "radio") {
+      const selected = form.querySelector(
+        'input[name="' + fieldName + '"]:checked'
+      );
+
+      answer = selected ? selected.value : "";
+
+    } else if (fields[0].type === "checkbox") {
+      answer = Array.from(fields)
+        .filter(input => input.checked)
+        .map(input => input.value)
+        .join(", ");
+
+    } else {
+      answer = fields[0].value.trim();
+    }
+
+    if (!answer) {
+      setMessage(
+        "dashboardMessage",
+        "Please answer all questions before submitting.",
+        "error"
+      );
+      return;
+    }
+
+    records.push({
+      survey_id: selectedSurvey.id,
+      question_id: question.id,
+      user_id: currentUser.id,
+      answer: answer
+    });
+  }
+
+  const submitButton =
+    form.querySelector('button[type="submit"]');
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting...";
+
+  try {
+    const isPaid = await hasConfirmedPayment();
+
+    if (!isPaid) {
+      throw new Error(
+        "Your membership access has not been confirmed."
+      );
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("responses")
+        .insert(records);
+
+    if (error) throw error;
 
     setMessage(
       "dashboardMessage",
@@ -1048,32 +1234,46 @@
       "Thank you for completing this survey.";
 
     await showHistory();
+
+  } catch (error) {
+    setMessage(
+      "dashboardMessage",
+      "Submission failed: " + error.message,
+      "error"
+    );
+
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit Responses";
+  }
+}
+
+// ==========================================
+// RESPONSE HISTORY
+// ==========================================
+
+async function showHistory() {
+  const area = document.getElementById("history");
+
+  if (!currentUser) {
+    area.textContent = "Please log in to view your history.";
+    return;
   }
 
-  // ==========================================
-  // RESPONSE HISTORY
-  // ==========================================
+  area.textContent = "Loading your response history...";
 
-  async function showHistory() {
+  try {
+    const { data: responses, error } =
+      await supabaseClient
+        .from("responses")
+        .select("survey_id, answer, created_at")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
 
-    const area = document.getElementById("history");
-
-    area.textContent = "Loading your response history...";
-
-    const { data: responses, error } = await supabase
-      .from("responses")
-      .select("survey_id, answer, created_at")
-      .eq("user_id", currentUser.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      area.textContent =
-        "Could not load history: " + error.message;
-      return;
-    }
+    if (error) throw error;
 
     if (!responses || responses.length === 0) {
-      area.textContent = "You have not submitted any surveys yet.";
+      area.textContent =
+        "You have not submitted any surveys yet.";
       return;
     }
 
@@ -1081,15 +1281,13 @@
       ...new Set(responses.map(item => item.survey_id))
     ];
 
-    const { data: surveys, error: surveyError } = await supabase
-      .from("surveys")
-      .select("id, title")
-      .in("id", surveyIds);
+    const { data: surveys, error: surveyError } =
+      await supabaseClient
+        .from("surveys")
+        .select("id, title")
+        .in("id", surveyIds);
 
-    if (surveyError) {
-      area.textContent = "Could not load survey titles.";
-      return;
-    }
+    if (surveyError) throw surveyError;
 
     const titleMap = {};
 
@@ -1100,7 +1298,6 @@
     area.innerHTML = "";
 
     responses.forEach(response => {
-
       const item = document.createElement("div");
       item.className = "survey-item";
 
@@ -1122,25 +1319,30 @@
 
       area.appendChild(item);
     });
+
+  } catch (error) {
+    area.textContent =
+      "Could not load history: " + error.message;
   }
+}
 
-  // ==========================================
-  // LOGOUT
-  // ==========================================
+// ==========================================
+// LOGOUT
+// ==========================================
 
-  document.getElementById("logoutBtn")
-    .addEventListener("click", async function() {
+document.getElementById("logoutBtn")
+  .addEventListener("click", async function() {
 
-      const { error } = await supabase.auth.signOut();
+    if (!appReady) return;
 
-      if (error) {
-        setMessage(
-          "dashboardMessage",
-          error.message,
-          "error"
-        );
-        return;
-      }
+    this.disabled = true;
+    this.textContent = "Logging out...";
+
+    try {
+      const { error } =
+        await supabaseClient.auth.signOut();
+
+      if (error) throw error;
 
       currentUser = null;
       selectedSurvey = null;
@@ -1148,14 +1350,56 @@
 
       updateNavigation();
 
+      document.getElementById("surveyList").textContent =
+        "Log in to view surveys.";
+
+      document.getElementById("surveyArea").textContent =
+        "Select a survey above to view its questions.";
+
+      document.getElementById("history").textContent =
+        "Log in to view your history.";
+
       showPage("homePage");
-    });
 
-  // ==========================================
-  // START APPLICATION
-  // ==========================================
+    } catch (error) {
+      setMessage(
+        "dashboardMessage",
+        "Logout failed: " + error.message,
+        "error"
+      );
+    } finally {
+      this.disabled = false;
+      this.textContent = "Logout";
+    }
+  });
 
-  checkSession();
+// ==========================================
+// START APPLICATION
+// ==========================================
+
+async function startApplication() {
+  const connected = initializeSupabase();
+
+  if (!connected) {
+    setMessage(
+      "loginMessage",
+      "Database connection failed. Check your internet connection and Supabase settings.",
+      "error"
+    );
+
+    setMessage(
+      "regMessage",
+      "Database connection failed. Check your internet connection and Supabase settings.",
+      "error"
+    );
+
+    return;
+  }
+
+  await checkSession();
+}
+
+startApplication();
 
 </script>
 
