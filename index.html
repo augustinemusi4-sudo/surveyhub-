@@ -52,7 +52,21 @@ button:disabled{opacity:.55;cursor:not-allowed}.message{font-weight:bold;overflo
 <p id="loginMessage" class="message" aria-live="polite"></p><p>Need an account? <a href="#" onclick="showPage('registerPage');return false">Register here</a></p></div></section>
 <section id="dashboardPage" class="page">
 <div class="card"><h2>Member Dashboard</h2><p>Welcome, <strong id="memberName">Member</strong></p><p>Account status: <strong id="memberStatus">Loading...</strong></p></div>
-<div class="card"><h3>Membership Access</h3><p>Proposed one-time access fee: <strong>KSh 50</strong></p><p id="paymentStatus">Checking payment status...</p><div class="notice">M-Pesa payment is not yet connected. Do not send money.</div><button class="primary" disabled>M-Pesa Payment Coming Soon</button></div>
+<div class="card">
+  <h3>Membership Access</h3>
+  <p>One-time membership access fee: <strong>KSh 50</strong></p>
+  <p id="paymentStatus">Checking payment status...</p>
+
+  <label for="paymentPhone">M-Pesa Phone Number</label>
+  <input id="paymentPhone" type="tel" placeholder="07XXXXXXXX">
+
+  <button class="primary" id="payButton" type="button" onclick="startMpesaPayment()">
+    Pay KSh 50 with M-Pesa
+  </button>
+
+  <p id="paymentMessage" class="message" aria-live="polite"></p>
+  <p class="notice">Only pay through the official M-Pesa prompt. Never share your M-Pesa PIN.</p>
+</div>
 <div class="card"><h3>Available Surveys</h3><div id="surveyList">Loading surveys...</div></div>
 <div class="card"><h3>Survey Form</h3><div id="surveyArea">Select a survey above.</div></div>
 <div class="card"><h3>My Response History</h3><div id="history">Loading history...</div></div>
@@ -202,13 +216,57 @@ async function hasConfirmedPayment(){
 }
 
 /* Members can view published surveys without paying. */
-async function loadSurveys(){
- const area=document.getElementById("surveyList");
- area.textContent="Loading surveys...";
- if(!currentUser){
-  area.textContent="Please log in to view surveys.";
-  return;
- }
+async function startMpesaPayment(){
+  if(!currentUser){
+    setMessage("paymentMessage","Please log in first.","error");
+    return;
+  }
+
+  const phone=document.getElementById("paymentPhone").value.trim();
+
+  if(!phone){
+    setMessage("paymentMessage","Enter your M-Pesa phone number.","error");
+    return;
+  }
+
+  const button=document.getElementById("payButton");
+  button.disabled=true;
+  button.textContent="Sending request...";
+
+  try{
+    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+
+    if(sessionError)throw sessionError;
+    if(!session)throw new Error("Please log in again.");
+
+    const response=await fetch("/api/mpesa/stkpush",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+session.access_token
+      },
+      body:JSON.stringify({phone})
+    });
+
+    const result=await response.json();
+
+    if(!response.ok){
+      throw new Error(result.error||result.message||"Payment request failed.");
+    }
+
+    setMessage(
+      "paymentMessage",
+      result.message||"Payment request sent. Check your phone for the M-Pesa prompt.",
+      "success"
+    );
+
+  }catch(error){
+    setMessage("paymentMessage","Payment error: "+error.message,"error");
+  }finally{
+    button.disabled=false;
+    button.textContent="Pay KSh 50 with M-Pesa";
+  }
+}
  try{
   const {data:surveys,error}=await supabaseClient.from("surveys")
    .select("id,title,description").eq("is_published",true).order("created_at",{ascending:false});
